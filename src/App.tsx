@@ -1,6 +1,29 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { createGlobalStyle, keyframes } from 'styled-components';
-import { type FeedItem, takeNextBatch } from './data/content';
+import {
+  type FeedCategory,
+  type FeedItem,
+  FEED_CATEGORIES,
+  takeNextBatch,
+} from './data/content';
+
+const CATEGORY_STORAGE_KEY = 'curiosity-feed.categories';
+
+function loadSavedCategories(): FeedCategory[] {
+  try {
+    const raw = localStorage.getItem(CATEGORY_STORAGE_KEY);
+    if (!raw) return [...FEED_CATEGORIES];
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [...FEED_CATEGORIES];
+    const valid = parsed.filter((c): c is FeedCategory =>
+      (FEED_CATEGORIES as readonly string[]).includes(c as string),
+    );
+    if (valid.length === 0) return [...FEED_CATEGORIES];
+    return valid;
+  } catch {
+    return [...FEED_CATEGORIES];
+  }
+}
 
 const MOBILE_MAX = '639px';
 
@@ -52,6 +75,7 @@ const CATEGORY_LABEL: Record<FeedItem['category'], string> = {
   philosophy: 'Philosophy',
   physics: 'Physics',
   math: 'Math',
+  psychology: 'Psychology',
   misc: 'Curiosity',
 };
 
@@ -59,6 +83,7 @@ const CATEGORY_ACCENT: Record<FeedItem['category'], string> = {
   philosophy: '#c9a227',
   physics: '#5eb8e8',
   math: '#a78bfa',
+  psychology: '#f0abfc',
   misc: '#6ee7b7',
 };
 
@@ -97,6 +122,55 @@ const TitleRow = styled.div`
   gap: 4px;
   max-width: 640px;
   margin: 0 auto;
+`;
+
+const TopicsLabel = styled.p`
+  margin: 14px 0 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(232 234 239 / 0.45);
+`;
+
+const TopicChips = styled.div`
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 640px;
+`;
+
+const TopicChip = styled.button<{ $selected: boolean; $accent: string }>`
+  appearance: none;
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid
+    ${(p) => (p.$selected ? p.$accent : 'rgb(255 255 255 / 0.14)')};
+  background: ${(p) =>
+    p.$selected ? `color-mix(in srgb, ${p.$accent} 22%, rgb(12 14 18 / 0.85))` : 'rgb(12 14 18 / 0.35)'};
+  color: ${(p) => (p.$selected ? p.$accent : 'rgb(232 234 239 / 0.75)')};
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover {
+    border-color: ${(p) => p.$accent};
+    color: ${(p) => p.$accent};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${(p) => p.$accent};
+    outline-offset: 2px;
+  }
 `;
 
 const Title = styled.h1`
@@ -470,21 +544,63 @@ type Row = { key: number; item: FeedItem };
 
 export function App() {
   const nextKeyRef = useRef(0);
+  const [selectedCategories, setSelectedCategories] = useState<FeedCategory[]>(() => loadSavedCategories());
   const [rows, setRows] = useState<Row[]>(() =>
-    takeNextBatch().map((item) => ({ key: nextKeyRef.current++, item })),
+    takeNextBatch({ categories: loadSavedCategories() }).map((item) => ({
+      key: nextKeyRef.current++,
+      item,
+    })),
   );
+  const feedRef = useRef<HTMLElement | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const loadingRef = useRef(false);
+
+  const categoriesHydratedRef = useRef(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(CATEGORY_STORAGE_KEY, JSON.stringify(selectedCategories));
+    } catch {
+      /* ignore quota / private mode */
+    }
+  }, [selectedCategories]);
+
+  useEffect(() => {
+    if (!categoriesHydratedRef.current) {
+      categoriesHydratedRef.current = true;
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    feedRef.current?.scrollTo({ top: 0, behavior: 'auto' });
+    nextKeyRef.current = 0;
+    setRows(
+      takeNextBatch({ categories: selectedCategories }).map((item) => ({
+        key: nextKeyRef.current++,
+        item,
+      })),
+    );
+  }, [selectedCategories]);
+
+  const toggleCategory = useCallback((cat: FeedCategory) => {
+    setSelectedCategories((prev) => {
+      const next = prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat];
+      if (next.length === 0) return [...FEED_CATEGORIES];
+      return next;
+    });
+  }, []);
 
   const loadMore = useCallback(() => {
     if (loadingRef.current) return;
     loadingRef.current = true;
-    const next = takeNextBatch().map((item) => ({ key: nextKeyRef.current++, item }));
+    const next = takeNextBatch({ categories: selectedCategories }).map((item) => ({
+      key: nextKeyRef.current++,
+      item,
+    }));
     setRows((prev) => [...prev, ...next]);
     queueMicrotask(() => {
       loadingRef.current = false;
     });
-  }, []);
+  }, [selectedCategories]);
 
   useEffect(() => {
     const el = sentinelRef.current;
@@ -510,11 +626,31 @@ export function App() {
           <TitleRow>
             <Title>Curiosity Feed</Title>
             <Subtitle>
-              Scroll instead of doomscroll — philosophy, science, math, and odd true things. The feed never runs out.
+              Scroll instead of doomscroll — pick topics you like; the feed never runs out.
             </Subtitle>
+            <TopicsLabel id="topics-label">Topics</TopicsLabel>
+            <TopicChips role="group" aria-labelledby="topics-label">
+              {FEED_CATEGORIES.map((cat) => {
+                const selected = selectedCategories.includes(cat);
+                const accent = CATEGORY_ACCENT[cat];
+                const label = CATEGORY_LABEL[cat];
+                return (
+                  <TopicChip
+                    key={cat}
+                    type="button"
+                    $selected={selected}
+                    $accent={accent}
+                    aria-pressed={selected}
+                    onClick={() => toggleCategory(cat)}
+                  >
+                    {label}
+                  </TopicChip>
+                );
+              })}
+            </TopicChips>
           </TitleRow>
         </TopBar>
-        <Feed>
+        <Feed ref={feedRef}>
           {rows.map((row) => (
             <FeedCard key={row.key} item={row.item} />
           ))}

@@ -1,4 +1,13 @@
-export type FeedCategory = 'philosophy' | 'physics' | 'math' | 'misc';
+export type FeedCategory = 'philosophy' | 'physics' | 'math' | 'psychology' | 'misc';
+
+/** All categories, stable order for UI and storage. */
+export const FEED_CATEGORIES: readonly FeedCategory[] = [
+  'philosophy',
+  'physics',
+  'math',
+  'psychology',
+  'misc',
+] as const;
 
 export interface FeedItem {
   id: string;
@@ -512,6 +521,129 @@ const RAW: Omit<FeedItem, 'id' | 'eli5'>[] = [
     explanation:
       'Common short words accumulate senses over centuries—nouns, verbs, sports, math, music—lexicography documents sprawling usage, not tidy one-to-one meanings.',
   },
+  {
+    category: 'psychology',
+    text: 'People tend to explain others’ behavior by personality and their own by circumstances — the fundamental attribution error.',
+    explanation:
+      'We overweight dispositional causes for other people’s actions and situational causes for our own; cross-cultural studies show the gap, though strength varies.',
+  },
+  {
+    category: 'psychology',
+    text: 'The Dunning–Kruger effect: novices often overestimate their skill, while experts can underestimate theirs.',
+    explanation:
+      'Metacognitive blind spots mean the least competent may lack the tools to see their gaps; experts assume others find easy what they mastered.',
+  },
+  {
+    category: 'psychology',
+    text: 'Delayed gratification in childhood correlates with later outcomes — the famous “marshmallow test,” with plenty of nuance.',
+    explanation:
+      'Longitudinal work linked waiting for a second treat to later competence, but replication shows context matters: trust, stability, and environment shape “waiting”.',
+  },
+  {
+    category: 'psychology',
+    text: 'A growth mindset frames ability as trainable; a fixed mindset treats it as static.',
+    attribution: 'Carol Dweck (popularized)',
+    explanation:
+      'Emphasizing effort and strategies versus innate talent changes how people respond to failure — though overselling “mindset” alone can ignore real barriers.',
+  },
+  {
+    category: 'psychology',
+    text: 'Classical conditioning links a neutral cue with a reflex — think Pavlov’s bell and salivation.',
+    explanation:
+      'Repeated pairing makes the cue alone trigger the response; extinction happens when the cue appears without the unconditioned stimulus long enough.',
+  },
+  {
+    category: 'psychology',
+    text: 'Operant conditioning shapes behavior through consequences — reinforcement strengthens, punishment suppresses.',
+    attribution: 'B. F. Skinner (tradition)',
+    explanation:
+      'Schedules of reinforcement (fixed, variable, ratio, interval) produce different response rates and extinction curves — the backbone of much behavior therapy design.',
+  },
+  {
+    category: 'psychology',
+    text: 'Confirmation bias: we notice and remember evidence that fits what we already believe.',
+    explanation:
+      'Testing hypotheses, we often search for confirming cases; disconfirmation feels costly, so beliefs can persist despite mixed data.',
+  },
+  {
+    category: 'psychology',
+    text: 'The availability heuristic: if examples come to mind easily, we judge them more frequent or likely.',
+    explanation:
+      'Vivid media coverage can inflate perceived risk of rare events; the heuristic is fast but systematically biased by memorability.',
+  },
+  {
+    category: 'psychology',
+    text: 'Memory is reconstructive, not a video replay — each recall can subtly rewrite the story.',
+    explanation:
+      'Schemas, suggestions, and new information blend into “memories”; eyewitness confidence poorly tracks accuracy without careful lineup procedures.',
+  },
+  {
+    category: 'psychology',
+    text: 'Sleep consolidates memory — cutting sleep especially hurts emotional regulation and learning.',
+    explanation:
+      'Slow-wave and REM sleep support different memory systems; chronic deprivation raises accident risk and impairs attention like mild intoxication.',
+  },
+  {
+    category: 'psychology',
+    text: 'The bystander effect: responsibility diffuses in a crowd, so help is less likely when many watch.',
+    explanation:
+      'Pluralistic ignorance and diffusion of responsibility matter; the story is more complex than the classic narrative, but group size affects intervention.',
+  },
+  {
+    category: 'psychology',
+    text: 'Cognitive dissonance: holding conflicting beliefs feels unpleasant, so we often change attitudes to match behavior.',
+    explanation:
+      'Festinger’s theory predicts rationalization after tough choices — “I chose it, so it must be good” — a core social-psychology mechanism.',
+  },
+  {
+    category: 'psychology',
+    text: 'The placebo effect is real neurobiological relief from belief and ritual, not “fake medicine” in outcome terms.',
+    explanation:
+      'Expectation, context, and conditioning modulate pain and symptoms; that is why trials need placebo controls and why ethics around placebos are delicate.',
+  },
+  {
+    category: 'psychology',
+    text: 'Hedonic adaptation: big wins and losses fade emotionally faster than we expect — we recalibrate to a baseline.',
+    explanation:
+      'Lottery winners and accident survivors often return toward prior happiness levels over time — forecasting neglects this “set point” drift.',
+  },
+  {
+    category: 'psychology',
+    text: 'Neuroplasticity means brains keep changing with practice — adulthood is not a frozen wiring diagram.',
+    explanation:
+      'Learning rewires synapses; stroke rehab and skill training exploit plasticity, though myths of “10% of the brain” are false.',
+  },
+  {
+    category: 'psychology',
+    text: 'The Stroop effect: naming ink colors is slower when the word disagrees — automatic reading interferes with the task.',
+    explanation:
+      'It reveals conflict between controlled and automatic processes; used in clinical screens and cognitive science paradigms.',
+  },
+  {
+    category: 'psychology',
+    text: 'Working memory is tiny — roughly a handful of chunks — which is why complex instructions overload us.',
+    attribution: 'George Miller (tradition)',
+    explanation:
+      'Miller’s “magical number seven” is a rough guide; chunking expands effective capacity by grouping items into meaningful units.',
+  },
+  {
+    category: 'psychology',
+    text: 'Attachment styles in close relationships echo early caregiving patterns — secure, anxious, avoidant, and mixed models.',
+    explanation:
+      'Longitudinal and adult measures show stability and change; therapy and new relationships can “earn” security over time.',
+  },
+  {
+    category: 'psychology',
+    text: 'Impostor phenomenon: high achievers who feel fraudulent despite evidence — common in new roles and underrepresented groups.',
+    explanation:
+      'It is not a clinical disorder but a widespread experience; naming it reduces shame and opens room for accurate self-appraisal.',
+  },
+  {
+    category: 'psychology',
+    text: 'Exposure therapy for phobias uses gradual, repeated contact with the feared cue in a safe context.',
+    explanation:
+      'Inhibitory learning updates threat predictions; escape and avoidance maintain fear — treatment undoes the cycle with hierarchy-based exposure.',
+  },
 ];
 
 /** Same order as `RAW` — ultra-plain paraphrases for each card. */
@@ -596,6 +728,26 @@ const ELI5_FOR_RAW: string[] = [
   'With almost no air, Mercury’s surface swings between very hot and very cold.',
   'DNA uses four letters, but bodies read them in messy, flexible ways.',
   'The word “set” has a huge pile of different meanings.',
+  'We blame other people’s choices on their personality, but our own on the situation.',
+  'Beginners sometimes think they’re great; experts sometimes forget how hard it is for others.',
+  'Kids who can wait for a second treat often do better later — but trust and home life matter too.',
+  'Believing you can get better with practice helps you keep trying after mistakes.',
+  'If a bell always comes with food, the bell alone can make you drool.',
+  'Rewards and consequences teach habits — timing and patterns matter.',
+  'We notice facts that fit what we already think and miss the rest.',
+  'If examples are easy to imagine, we think they happen more often.',
+  'Memories get rebuilt each time you remember — not like replaying a perfect video.',
+  'Sleep helps your brain store what you learned and steady your mood.',
+  'In a crowd, everyone may wait for someone else to help first.',
+  'When two beliefs clash, we often change our mind to feel less uncomfortable.',
+  'Believing a pill helps can really ease pain — your brain joins in.',
+  'Big good or bad events feel huge at first, then feelings often drift back toward normal.',
+  'Brains can rewire when you learn or practice — they’re not stuck forever.',
+  'Reading a color word is automatic, so it’s hard to name the ink when they disagree.',
+  'You can only juggle a few ideas at once — grouping helps.',
+  'Early bonds shape how we expect closeness to feel later — but people can change.',
+  'Even capable people sometimes feel like a faker — it’s common.',
+  'Facing a fear in small safe steps can teach your brain it’s not so dangerous.',
 ];
 
 if (ELI5_FOR_RAW.length !== RAW.length) {
@@ -617,9 +769,21 @@ function shuffleInPlace<T>(arr: T[]): void {
   }
 }
 
+function poolForCategories(categories: FeedCategory[] | undefined): FeedItem[] {
+  if (!categories || categories.length === 0) return [...MASTER_ITEMS];
+  return MASTER_ITEMS.filter((item) => categories.includes(item.category));
+}
+
+export type TakeNextBatchOptions = {
+  /** If empty or omitted, all categories are included. */
+  categories?: FeedCategory[] | null;
+};
+
 /** Yields endless random batches from the master pool without immediate repeats within a batch. */
-export function takeNextBatch(): FeedItem[] {
-  const copy = [...MASTER_ITEMS];
+export function takeNextBatch(options?: TakeNextBatchOptions): FeedItem[] {
+  let pool = poolForCategories(options?.categories ?? undefined);
+  if (pool.length === 0) pool = [...MASTER_ITEMS];
+  const copy = [...pool];
   shuffleInPlace(copy);
   return copy.slice(0, Math.min(BATCH_SIZE, copy.length));
 }
