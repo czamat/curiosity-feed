@@ -6,10 +6,12 @@ export interface FeedItem {
   text: string;
   /** Short context: why the quote matters, or what the fact means in plain language. */
   explanation: string;
+  /** Shortest, plainest gloss — “explain like I’m five.” */
+  eli5: string;
   attribution?: string;
 }
 
-const RAW: Omit<FeedItem, 'id'>[] = [
+const RAW: Omit<FeedItem, 'id' | 'eli5'>[] = [
   {
     category: 'philosophy',
     text: 'The unexamined life is not worth living.',
@@ -512,9 +514,98 @@ const RAW: Omit<FeedItem, 'id'>[] = [
   },
 ];
 
+/** Same order as `RAW` — ultra-plain paraphrases for each card. */
+const ELI5_FOR_RAW: string[] = [
+  'If you never stop and think about how you’re living, you might waste your life on autopilot.',
+  'The one thing you can’t doubt is that you’re thinking right now.',
+  'Feeling happy is more about imagination than cold logic.',
+  'If you know why you’re doing something hard, you can put up with almost anything.',
+  'Saying “I don’t know” can be the start of real wisdom.',
+  'You become what you do over and over — good or bad.',
+  'If you don’t have words for something, it’s harder to think clearly about it.',
+  'Growing up as a “woman” or “man” is learned from society, not only from biology.',
+  'You can still feel okay even when you’re not perfect.',
+  'Pick the simplest story that fits — don’t add extra guesses for no reason.',
+  'You’re always choosing something — even “not choosing” is a choice.',
+  'Care about people, but also learn what’s true so you don’t hurt them by mistake.',
+  'If you can’t say it clearly, don’t pretend you did.',
+  'We often understand a time only after it’s mostly over.',
+  'Some thinkers say ordinary objects need to be experienced to fully “be there” for us.',
+  'Only do things you’d be okay with everyone doing.',
+  'Other people see you and judge you — that can feel uncomfortable.',
+  'Philosophy helps you understand hard questions, not just follow a simple rulebook.',
+  'Freedom is real when people who disagree are safe too.',
+  'Doubt everything until you find one thing you’re sure of — then build carefully.',
+  'Nothing can go faster than light in empty space.',
+  'If you zoom past someone, your clock looks slower to them — and GPS has to fix this.',
+  'Quantum links are weird, but they don’t send usable messages faster than light.',
+  'A black hole is a place where gravity traps even light.',
+  'Closed systems tend to get messier over time — that’s why time has a direction.',
+  'Tiny things act like waves until you measure them, then you get one definite result.',
+  'Neutrinos are ghostly particles that fly through you almost without noticing.',
+  'Some super-cold wires carry electricity without wasting energy as heat.',
+  'Tiny changes at the start can make huge differences later — the “butterfly effect.”',
+  'Certain particles can’t share the same quantum “seat,” and that shapes atoms.',
+  'Huge things crashing in space send ripples we can detect with giant rulers.',
+  'You can’t reach a temperature where every bit of motion stops — a little jitter stays.',
+  'A laser lines up light waves so they march together — useful for tools and science.',
+  'Stars shine by turning a tiny bit of mass into a lot of energy.',
+  'The universe left a faint glow from when it first became see-through.',
+  'Computer chips use materials whose electricity can be switched in tiny gaps.',
+  'You can’t perfectly pin down both where something is and how fast it’s going.',
+  'One way to do quantum math is to add up many possible paths.',
+  'There’s extra gravity in space that we can’t see — we call it dark matter.',
+  'A field in space helps give particles their mass.',
+  'Primes never run out — there’s always another one you didn’t list yet.',
+  'The square root of two can’t be written as a clean fraction.',
+  'A famous shortcut ties the numbers e, π, and i in one small formula.',
+  'Add 1 + 1/2 + 1/3 + … forever and the sum grows without end, but very slowly.',
+  'In rich enough math, some true statements can’t be proved inside one fixed system.',
+  'In a room of 23 people, two sharing a birthday is more likely than it feels.',
+  'Only five perfectly regular 3D dice shapes exist.',
+  'On a game show, switching doors often wins because the host showed you a goat.',
+  'Repeat a simple rule over and over and you can get infinite detail (fractals).',
+  'A famous sum of fractions lands exactly on π²/6.',
+  'Some infinite lists are bigger than others — infinity isn’t one size.',
+  'Any flat map can be colored with at most four colors so neighbors differ.',
+  'For cubes and higher powers, there are no whole-number solutions like ordinary Pythagorean triples.',
+  'About 1.618 shows up in shapes and growth — not every spiral is “golden,” though.',
+  'Start with a guess, then update it when new evidence shows up.',
+  'A famous unsolved idea connects prime numbers to special zeros in a function.',
+  'You can’t walk every bridge once on the old Königsberg map.',
+  'Speed and “area under the curve” are opposite ideas that help each other.',
+  'The number i makes circles and waves easier to describe, even if it looks odd.',
+  'If you have more things than boxes, at least one box gets two things.',
+  'An octopus’s arms can do a lot on their own without the brain ordering every move.',
+  'Thick sugar and natural chemistry keep sealed honey from spoiling.',
+  'Some European schools are older than empires you picture as ancient.',
+  'Your gut bugs talk to your brain and immune system — not just digestion.',
+  'Venus spins backward and a day there is longer than its year.',
+  'Sharks as a group showed up before widespread forests.',
+  'Your brain burns a big chunk of your resting calories.',
+  'Botanists call some fruits “berries” differently than grocery stores do.',
+  'Wombat intestines shape poop into little cubes.',
+  'One jellyfish can rewind to a younger stage — but most still get eaten.',
+  'A tiny war in 1896 may have lasted about 45 minutes.',
+  'Cleopatra lived closer to the Moon landing than to the Great Pyramid.',
+  'Old window glass is thicker at the bottom because of how it was made and installed.',
+  'A bunch of flamingos is called a flamboyance.',
+  'Rain frees smelly stuff from soil — that’s the earthy smell.',
+  'Sloths poop rarely because going to the ground is dangerous.',
+  'There are more ways to shuffle a deck than atoms on Earth.',
+  'With almost no air, Mercury’s surface swings between very hot and very cold.',
+  'DNA uses four letters, but bodies read them in messy, flexible ways.',
+  'The word “set” has a huge pile of different meanings.',
+];
+
+if (ELI5_FOR_RAW.length !== RAW.length) {
+  throw new Error(`ELI5_FOR_RAW length ${ELI5_FOR_RAW.length} does not match RAW length ${RAW.length}`);
+}
+
 export const MASTER_ITEMS: FeedItem[] = RAW.map((item, i) => ({
   ...item,
   id: `m-${i}`,
+  eli5: ELI5_FOR_RAW[i]!,
 }));
 
 const BATCH_SIZE = 12;

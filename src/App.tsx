@@ -301,6 +301,77 @@ const Explanation = styled.p`
   }
 `;
 
+const Eli5Row = styled.div`
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-start;
+
+  @media (max-width: ${MOBILE_MAX}) {
+    justify-content: center;
+  }
+`;
+
+const Eli5Button = styled.button<{ $accent: string }>`
+  appearance: none;
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid ${(p) => p.$accent};
+  background: rgb(12 14 18 / 0.5);
+  color: ${(p) => p.$accent};
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover {
+    background: color-mix(in srgb, ${(p) => p.$accent} 14%, rgb(12 14 18 / 0.65));
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${(p) => p.$accent};
+    outline-offset: 2px;
+  }
+`;
+
+const Eli5Block = styled.div`
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.04);
+  border: 1px solid rgb(255 255 255 / 0.08);
+
+  @media (max-width: ${MOBILE_MAX}) {
+    text-align: center;
+  }
+`;
+
+const Eli5Label = styled.p`
+  margin: 0 0 6px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgb(232 234 239 / 0.45);
+`;
+
+const Eli5Text = styled.p`
+  margin: 0;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-weight: 400;
+  color: rgb(232 234 239 / 0.88);
+  text-wrap: balance;
+`;
+
 const ScrollCue = styled.div`
   display: none;
 
@@ -355,6 +426,8 @@ const LoadingHint = styled.p`
 function FeedCard({ item }: { item: FeedItem }) {
   const accent = CATEGORY_ACCENT[item.category];
   const label = CATEGORY_LABEL[item.category];
+  const [eli5Open, setEli5Open] = useState(false);
+  const eli5PanelId = `eli5-${item.id}`;
   return (
     <Card $accent={accent} aria-label={`${label}: ${item.text.slice(0, 80)}`}>
       <CardInner>
@@ -365,6 +438,23 @@ function FeedCard({ item }: { item: FeedItem }) {
             {item.attribution ? <Attribution>— {item.attribution}</Attribution> : null}
             <ExplanationLabel>What this means</ExplanationLabel>
             <Explanation>{item.explanation}</Explanation>
+            <Eli5Row>
+              <Eli5Button
+                type="button"
+                $accent={accent}
+                aria-expanded={eli5Open}
+                aria-controls={eli5PanelId}
+                onClick={() => setEli5Open((v) => !v)}
+              >
+                {eli5Open ? 'Hide ELI5' : 'ELI5'}
+              </Eli5Button>
+            </Eli5Row>
+            {eli5Open ? (
+              <Eli5Block id={eli5PanelId} role="region" aria-label="Explain like I’m five">
+                <Eli5Label>Even simpler</Eli5Label>
+                <Eli5Text>{item.eli5}</Eli5Text>
+              </Eli5Block>
+            ) : null}
           </CardBody>
         </CardContentWrap>
         <ScrollCue aria-hidden>
