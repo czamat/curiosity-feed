@@ -169,16 +169,22 @@ const Card = styled.article<{ $accent: string }>`
   @media (max-width: ${MOBILE_MAX}) {
     flex-shrink: 0;
     min-height: 100%;
-    padding: 16px 0 12px;
+    padding: 20px 0 12px;
     border-bottom: none;
     box-shadow: inset 0 -1px 0 rgb(255 255 255 / 0.06);
     scroll-snap-align: start;
     scroll-snap-stop: always;
     justify-content: flex-start;
+    align-items: center;
 
     &::before {
-      top: 16px;
-      bottom: 12px;
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%);
+      top: 0;
+      bottom: auto;
+      width: 44px;
+      height: 3px;
     }
   }
 `;
@@ -191,20 +197,36 @@ const CardInner = styled.div`
     display: flex;
     flex-direction: column;
     min-height: 0;
-    padding-left: 16px;
-    padding-right: 2px;
+    width: 100%;
+    max-width: 26rem;
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+    align-items: center;
+  }
+`;
+
+const CardContentWrap = styled.div`
+  @media (max-width: ${MOBILE_MAX}) {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
   }
 `;
 
 const CardBody = styled.div`
   @media (max-width: ${MOBILE_MAX}) {
-    flex: 1;
-    min-height: 0;
+    width: 100%;
+    max-height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
-    padding-right: 4px;
+    text-align: center;
   }
 `;
 
@@ -216,6 +238,11 @@ const Badge = styled.span<{ $accent: string }>`
   text-transform: uppercase;
   color: ${(p) => p.$accent};
   margin-bottom: 12px;
+
+  @media (max-width: ${MOBILE_MAX}) {
+    margin-left: auto;
+    margin-right: auto;
+  }
 `;
 
 const Quote = styled.blockquote`
@@ -225,6 +252,11 @@ const Quote = styled.blockquote`
   line-height: 1.45;
   font-weight: 400;
   color: #f5f6f9;
+
+  @media (max-width: ${MOBILE_MAX}) {
+    text-align: center;
+    text-wrap: balance;
+  }
 `;
 
 const Attribution = styled.cite`
@@ -234,6 +266,10 @@ const Attribution = styled.cite`
   font-size: 0.875rem;
   font-style: normal;
   color: rgb(232 234 239 / 0.5);
+
+  @media (max-width: ${MOBILE_MAX}) {
+    text-align: center;
+  }
 `;
 
 const ExplanationLabel = styled.p`
@@ -243,6 +279,10 @@ const ExplanationLabel = styled.p`
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: rgb(232 234 239 / 0.4);
+
+  @media (max-width: ${MOBILE_MAX}) {
+    text-align: center;
+  }
 `;
 
 const Explanation = styled.p`
@@ -256,6 +296,8 @@ const Explanation = styled.p`
   @media (max-width: ${MOBILE_MAX}) {
     font-size: 0.875rem;
     line-height: 1.5;
+    text-align: center;
+    text-wrap: balance;
   }
 `;
 
@@ -316,13 +358,15 @@ function FeedCard({ item }: { item: FeedItem }) {
   return (
     <Card $accent={accent} aria-label={`${label}: ${item.text.slice(0, 80)}`}>
       <CardInner>
-        <CardBody>
-          <Badge $accent={accent}>{label}</Badge>
-          <Quote>{item.text}</Quote>
-          {item.attribution ? <Attribution>— {item.attribution}</Attribution> : null}
-          <ExplanationLabel>What this means</ExplanationLabel>
-          <Explanation>{item.explanation}</Explanation>
-        </CardBody>
+        <CardContentWrap>
+          <CardBody>
+            <Badge $accent={accent}>{label}</Badge>
+            <Quote>{item.text}</Quote>
+            {item.attribution ? <Attribution>— {item.attribution}</Attribution> : null}
+            <ExplanationLabel>What this means</ExplanationLabel>
+            <Explanation>{item.explanation}</Explanation>
+          </CardBody>
+        </CardContentWrap>
         <ScrollCue aria-hidden>
           <span>Scroll for more</span>
           <ScrollCueIcon>↓</ScrollCueIcon>
