@@ -318,9 +318,17 @@ export const ROTATING_QUOTES: Record<FeedCategory, QuoteRow[]> = {
   ],
 };
 
-const KIND_CYCLE: FeedCardKind[] = ['fact', 'idea', 'concept', 'quote'];
-
 const H = (i: number, m: number) => ((i * 7919 + 104729) % m + m) % m;
+
+/** Procedural mix: 80% quotes, 20% split among fact / idea / concept (two slots per block of 10). */
+function proceduralKindAt(i: number): FeedCardKind {
+  const pos = i % 10;
+  if (pos < 8) return 'quote';
+  const block = Math.floor(i / 10);
+  const trio: readonly FeedCardKind[] = ['fact', 'idea', 'concept'];
+  if (pos === 8) return trio[block % 3]!;
+  return trio[(block + 1) % 3]!;
+}
 
 function pick<T>(arr: readonly T[], i: number, salt: number): T {
   return arr[H(i + salt, arr.length)]!;
@@ -1092,7 +1100,7 @@ function synth(cat: FeedCategory, kind: FeedCardKind, i: number): FeedItem {
   };
 }
 
-/** ~1000 generated cards per topic (facts, ideas, concepts) plus rotating quotes on every fourth card. */
+/** ~1000 generated cards per topic: ~80% quotes, ~20% fact/idea/concept. */
 export const PROCEDURAL_PER_TOPIC = 1000;
 
 export function generateProceduralDeck(perCategory: number): FeedItem[] {
@@ -1100,9 +1108,9 @@ export function generateProceduralDeck(perCategory: number): FeedItem[] {
   for (const cat of FEED_CATEGORIES) {
     const quotes = ROTATING_QUOTES[cat];
     for (let i = 0; i < perCategory; i++) {
-      const kind = KIND_CYCLE[i % 4]!;
+      const kind = proceduralKindAt(i);
       if (kind === 'quote') {
-        const q = quotes[H(Math.floor(i / 4), quotes.length)]!;
+        const q = quotes[H(i, quotes.length)]!;
         out.push({
           id: `p-${cat}-q-${i}`,
           category: cat,
