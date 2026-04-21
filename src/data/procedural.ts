@@ -705,7 +705,7 @@ function synth(cat: FeedCategory, kind: FeedCardKind, i: number): FeedItem {
       id: `p-${cat}-${i}-i`,
       category: cat,
       kind: 'idea',
-      text: `Idea — try linking ${t} to ${t2} as a pair: let one supply constraints while the other supplies degrees of freedom.`,
+      text: `Try linking ${t} to ${t2} as a pair: let one supply constraints while the other supplies degrees of freedom.`,
       explanation: `This pairing is a design move, not a proof: it tells you what to vary first when teaching, debugging, or arguing. If the story feels forced, swap which side plays “constraint” and which plays “freedom” and see which ordering matches cases you care about.`,
       eli5: `Think of one topic as the “rules” and the other as the “wiggle room,” then swap if it feels wrong.`,
     };
@@ -715,7 +715,7 @@ function synth(cat: FeedCategory, kind: FeedCardKind, i: number): FeedItem {
     id: `p-${cat}-${i}-c`,
     category: cat,
     kind: 'concept',
-    text: `Concept — “${t} lens”: the habit of asking which parts of a situation are stable under the same moves that preserve ${t2}.`,
+    text: `“${t} lens”: the habit of asking which parts of a situation are stable under the same moves that preserve ${t2}.`,
     explanation: `A “lens” is a reusable question-generator, not a slogan. Used well, it slows you down where naïve analogies speed you up — especially when two stories sound similar but break under different stress tests.`,
     eli5: `A “lens” means a special pair of glasses for thinking — it changes what you notice.`,
   };

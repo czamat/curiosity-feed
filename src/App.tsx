@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { createGlobalStyle, keyframes } from 'styled-components';
 import {
-  type FeedCardKind,
   type FeedCategory,
   type FeedItem,
   FEED_CATEGORIES,
@@ -86,13 +85,6 @@ const CATEGORY_ACCENT: Record<FeedItem['category'], string> = {
   math: '#a78bfa',
   psychology: '#f0abfc',
   misc: '#6ee7b7',
-};
-
-const KIND_LABEL: Record<FeedCardKind, string> = {
-  quote: 'Quote',
-  fact: 'Fact',
-  idea: 'Idea',
-  concept: 'Concept',
 };
 
 const Shell = styled.div`
@@ -522,7 +514,6 @@ const LoadingHint = styled.p`
 function FeedCard({ item }: { item: FeedItem }) {
   const accent = CATEGORY_ACCENT[item.category];
   const label = CATEGORY_LABEL[item.category];
-  const kindLabel = KIND_LABEL[item.kind];
   const [eli5Open, setEli5Open] = useState(false);
   const eli5PanelId = `eli5-${item.id}`;
   return (
@@ -530,9 +521,7 @@ function FeedCard({ item }: { item: FeedItem }) {
       <CardInner>
         <CardContentWrap>
           <CardBody>
-            <Badge $accent={accent}>
-              {label} · {kindLabel}
-            </Badge>
+            <Badge $accent={accent}>{label}</Badge>
             {item.kind === 'quote' ? <Quote>{item.text}</Quote> : <FactIdeaBody>{item.text}</FactIdeaBody>}
             {item.kind === 'quote' && item.attribution ? <Attribution>— {item.attribution}</Attribution> : null}
             <ExplanationLabel>What this means</ExplanationLabel>
