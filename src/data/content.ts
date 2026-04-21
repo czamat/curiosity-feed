@@ -1,26 +1,12 @@
-export type FeedCategory = 'philosophy' | 'physics' | 'math' | 'psychology' | 'misc';
+import type { FeedCardKind, FeedCategory, FeedItem } from './types';
+import { PROCEDURAL_PER_TOPIC, generateProceduralDeck } from './procedural';
 
-/** All categories, stable order for UI and storage. */
-export const FEED_CATEGORIES: readonly FeedCategory[] = [
-  'philosophy',
-  'physics',
-  'math',
-  'psychology',
-  'misc',
-] as const;
+export type { FeedCardKind, FeedCategory, FeedItem } from './types';
+export { FEED_CATEGORIES } from './types';
 
-export interface FeedItem {
-  id: string;
-  category: FeedCategory;
-  text: string;
-  /** Short context: why the quote matters, or what the fact means in plain language. */
-  explanation: string;
-  /** Shortest, plainest gloss — “explain like I’m five.” */
-  eli5: string;
-  attribution?: string;
-}
+type RawItem = Omit<FeedItem, 'id' | 'eli5' | 'kind'> & { kind?: FeedCardKind };
 
-const RAW: Omit<FeedItem, 'id' | 'eli5'>[] = [
+const RAW: RawItem[] = [
   {
     category: 'philosophy',
     text: 'The unexamined life is not worth living.',
@@ -754,11 +740,14 @@ if (ELI5_FOR_RAW.length !== RAW.length) {
   throw new Error(`ELI5_FOR_RAW length ${ELI5_FOR_RAW.length} does not match RAW length ${RAW.length}`);
 }
 
-export const MASTER_ITEMS: FeedItem[] = RAW.map((item, i) => ({
+const fromRaw: FeedItem[] = RAW.map((item, i) => ({
   ...item,
+  kind: item.kind ?? (item.attribution ? ('quote' as const) : ('fact' as const)),
   id: `m-${i}`,
   eli5: ELI5_FOR_RAW[i]!,
 }));
+
+export const MASTER_ITEMS: FeedItem[] = [...fromRaw, ...generateProceduralDeck(PROCEDURAL_PER_TOPIC)];
 
 const BATCH_SIZE = 12;
 
